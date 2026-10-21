@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>مؤسسة سامر عبد العزيز العلاونه لتجارة السيارات</title>
+  <meta name="description" content="معرض مؤسسة سامر عبد العزيز العلاونه لتجارة السيارات في إربد، شارع المعارض وشارع حكما.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="/media/profile.jpg">
+</head>
+<body>
+  <a class="skip" href="#content">تخطي إلى المحتوى</a>
+  <header class="header">
+    <div class="wrap header-inner">
+      <a class="brand" href="/">
+        <img data-logo src="/media/profile.jpg" alt="صورة صفحة المعرض">
+        <div>
+          <strong data-brand-name>مؤسسة سامر عبد العزيز العلاونه لتجارة السيارات</strong>
+          <span>إربد · شارع المعارض وشارع حكما</span>
+        </div>
+      </a>
+      <nav class="nav">
+        <a href="/" aria-current="page">الرئيسية</a>
+        <a href="/cars">السيارات</a>
+        <a href="/about">من نحن</a>
+        <a href="/contact">تواصل معنا</a>
+      </nav>
+      <a class="header-call" href="tel:+962792066680">اتصال 0792066680</a>
+    </div>
+  </header>
+  <main id="content">
+    <section class="hero" id="hero">
+      <div class="wrap hero-content">
+        <span class="kicker">إربد</span>
+        <h1 data-brand-name>مؤسسة سامر عبد العزيز العلاونه لتجارة السيارات</h1>
+        <p id="hero-bio">مؤسسه سامر عبد العزيز العلاونه لتجاره السيارت. اربد شارع المعارض بجانب الملعب البلدي، وشارع حكما.</p>
+        <div class="actions">
+          <a class="btn btn-gold" href="/cars">تصفح السيارات</a>
+          <a class="btn btn-light" href="tel:+962792066680">اتصال مباشر</a>
+          <a class="btn btn-line" href="/contact">تواصل معنا</a>
+        </div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="wrap">
+        <h2>سيارات من صفحة المعرض</h2>
+        <p class="lead">العروض التالية مأخوذة من منشورات الصفحة. إذا لم يُذكر أن السيارة بيعت، التوفر يحتاج تأكيدًا. وإذا لم يُنشر السعر، السعر عند التواصل.</p>
+        <div class="cars-grid" id="featured"></div>
+        <div class="actions">
+          <a class="btn btn-navy" href="/cars">كل السيارات</a>
+        </div>
+      </div>
+    </section>
+    <section class="section" style="padding-top:0">
+      <div class="wrap grid-2">
+        <article class="panel">
+          <h2>المعارض</h2>
+          <p class="lead">الفرع الرئيسي في شارع المعارض بجانب الملعب البلدي، والفرع الثاني في شارع حكما.</p>
+          <div class="actions">
+            <a class="btn btn-navy" href="/about">من نحن</a>
+            <a class="btn btn-gold" href="/contact">العنوان والخريطة</a>
+          </div>
+        </article>
+        <article class="panel">
+          <h2>أوقات العمل</h2>
+          <div class="hours" id="hours"></div>
+        </article>
+      </div>
+    </section>
+  </main>
+  <footer class="footer">
+    <div class="wrap footer-grid">
+      <div>
+        <strong data-brand-name>مؤسسة سامر عبد العزيز العلاونه لتجارة السيارات</strong>
+        <div>0792066680 · 0786404818</div>
+      </div>
+      <div><a href="https://www.facebook.com/profile.php?id=100064420673073">صفحة فيسبوك</a></div>
+    </div>
+  </footer>
+  <script type="module">
+    import { carCard, fillHeader, loadCars, loadSite } from "/js/site.js";
+    const [site, cars] = await Promise.all([loadSite(), loadCars()]);
+    fillHeader(site);
+    const hero = document.getElementById("hero");
+    if (site.hero) hero.style.backgroundImage = `url("${site.hero}")`;
+    document.getElementById("hero-bio").textContent = site.bio.join(" · ");
+    const hours = document.getElementById("hours");
+    for (const row of site.hours) {
+      const line = document.createElement("div");
+      line.innerHTML = `<span></span><b></b>`;
+      line.querySelector("span").textContent = row.day;
+      line.querySelector("b").textContent = row.time;
+      hours.append(line);
+    }
+    const featured = document.getElementById("featured");
+    const picks = [...cars.filter((car) => car.status !== "sold"), ...cars.filter((car) => car.status === "sold")].slice(0, 6);
+    picks.forEach((car) => featured.append(carCard(car)));
+  </script>
+</body>
+</html>

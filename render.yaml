@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: alawneh-motors
+    runtime: static
+    buildCommand: node scripts/export-static.mjs
+    staticPublishPath: public
+    routes:
+      - type: rewrite
+        source: /cars
+        destination: /cars.html
+      - type: rewrite
+        source: /cars/*
+        destination: /car.html
+      - type: rewrite
+        source: /about
+        destination: /about.html
+      - type: rewrite
+        source: /contact
+        destination: /contact.html
+      - type: rewrite
+        source: /admin
+        destination: /admin.html

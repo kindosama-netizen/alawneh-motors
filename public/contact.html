@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>تواصل معنا | مؤسسة سامر العلاونه</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="/media/profile.jpg">
+</head>
+<body>
+  <header class="header">
+    <div class="wrap header-inner">
+      <a class="brand" href="/">
+        <img data-logo src="/media/profile.jpg" alt="صورة صفحة المعرض">
+        <div>
+          <strong data-brand-name>مؤسسة سامر عبد العزيز العلاونه لتجارة السيارات</strong>
+          <span>إربد · شارع المعارض وشارع حكما</span>
+        </div>
+      </a>
+      <nav class="nav">
+        <a href="/">الرئيسية</a>
+        <a href="/cars">السيارات</a>
+        <a href="/about">من نحن</a>
+        <a href="/contact" aria-current="page">تواصل معنا</a>
+      </nav>
+      <a class="header-call" href="tel:+962792066680">اتصال 0792066680</a>
+    </div>
+  </header>
+  <main class="section">
+    <div class="wrap">
+      <h1>تواصل معنا</h1>
+      <p class="lead">أرقام التواصل والبريد ورابط فيسبوك كما وردت في الصفحة ومنشوراتها ولوحة المعرض. زر واتساب يفتح محادثة على الرقم الرئيسي المنشور.</p>
+      <div class="grid-2">
+        <section class="panel">
+          <h2>الهاتف وواتساب</h2>
+          <div class="phones" id="phones"></div>
+          <div class="actions">
+            <a class="btn btn-wa" id="wa" target="_blank" rel="noopener">واتساب</a>
+            <a class="btn btn-navy" id="mail"></a>
+            <a class="btn btn-gold" id="fb" target="_blank" rel="noopener">فيسبوك</a>
+          </div>
+          <h2>أوقات العمل</h2>
+          <div class="hours" id="hours"></div>
+          <p class="note" id="hours-note"></p>
+        </section>
+        <section id="branches"></section>
+      </div>
+    </div>
+  </main>
+  <footer class="footer">
+    <div class="wrap footer-grid">
+      <strong>مؤسسة سامر عبد العزيز العلاونه لتجارة السيارات</strong>
+      <a href="/cars">تصفح السيارات</a>
+    </div>
+  </footer>
+  <script type="module">
+    import { el, fillHeader, loadSite } from "/js/site.js";
+    const site = await loadSite();
+    fillHeader(site);
+    const phones = document.getElementById("phones");
+    site.phones.forEach((phone) => {
+      const link = el("a", { href: `tel:${phone.tel}` }, [
+        el("b", {}, phone.display),
+        el("span", {}, phone.note)
+      ]);
+      phones.append(link);
+    });
+    const wa = document.getElementById("wa");
+    wa.href = `https://wa.me/${site.whatsapp}?text=${encodeURIComponent("السلام عليكم، أرغب بالاستفسار عن السيارات المتوفرة لديكم.")}`;
+    const mail = document.getElementById("mail");
+    mail.href = `mailto:${site.email}`;
+    mail.textContent = site.email;
+    const fb = document.getElementById("fb");
+    fb.href = site.facebook;
+    const hours = document.getElementById("hours");
+    site.hours.forEach((row) => {
+      hours.append(el("div", {}, [el("span", {}, row.day), el("b", {}, row.time)]));
+    });
+    document.getElementById("hours-note").textContent = site.hoursNote;
+    const branches = document.getElementById("branches");
+    site.branches.forEach((branch) => {
+      const box = el("article", { class: "panel" }, [
+        el("h2", {}, branch.name),
+        el("p", {}, branch.address),
+        el("p", { class: "note" }, branch.detail),
+        el("p", { class: "note" }, branch.mapNote),
+        el("a", { class: "btn btn-navy", href: branch.maps, target: "_blank", rel: "noopener" }, "فتح الموقع في خرائط جوجل")
+      ]);
+      if (branch.lat && branch.lng) {
+        box.append(el("iframe", {
+          class: "map",
+          title: branch.name,
+          loading: "lazy",
+          referrerpolicy: "no-referrer",
+          src: `https://www.openstreetmap.org/export/embed.html?bbox=${branch.lng - 0.01}%2C${branch.lat - 0.008}%2C${branch.lng + 0.01}%2C${branch.lat + 0.008}&layer=mapnik&marker=${branch.lat}%2C${branch.lng}`
+        }));
+      }
+      branches.append(box);
+    });
+  </script>
+</body>
+</html>

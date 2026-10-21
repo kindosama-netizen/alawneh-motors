@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>من نحن | مؤسسة سامر العلاونه</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="/media/profile.jpg">
+</head>
+<body>
+  <header class="header">
+    <div class="wrap header-inner">
+      <a class="brand" href="/">
+        <img data-logo src="/media/profile.jpg" alt="صورة صفحة المعرض">
+        <div>
+          <strong data-brand-name>مؤسسة سامر عبد العزيز العلاونه لتجارة السيارات</strong>
+          <span>إربد · شارع المعارض وشارع حكما</span>
+        </div>
+      </a>
+      <nav class="nav">
+        <a href="/">الرئيسية</a>
+        <a href="/cars">السيارات</a>
+        <a href="/about" aria-current="page">من نحن</a>
+        <a href="/contact">تواصل معنا</a>
+      </nav>
+      <a class="header-call" href="tel:+962792066680">اتصال 0792066680</a>
+    </div>
+  </header>
+  <main class="section">
+    <div class="wrap">
+      <h1>من نحن</h1>
+      <div class="grid-2">
+        <article class="panel" id="about-copy"></article>
+        <aside class="panel">
+          <img data-logo src="/media/profile.jpg" alt="الصورة الشخصية لصفحة المعرض" style="width:140px;height:140px;border-radius:50%;object-fit:cover;border:3px solid var(--gold)">
+          <p class="note" id="rating"></p>
+          <p class="note">الاسم الآخر المنشور على الصفحة: سامر عبدالعزيز العلاونه</p>
+        </aside>
+      </div>
+      <h2>مما ورد في المنشورات</h2>
+      <ul class="specs" id="services"></ul>
+      <h2>تقييمات منشورة</h2>
+      <div class="reviews" id="reviews"></div>
+    </div>
+  </main>
+  <footer class="footer">
+    <div class="wrap footer-grid">
+      <strong>مؤسسة سامر عبد العزيز العلاونه لتجارة السيارات</strong>
+      <a href="/contact">تواصل معنا</a>
+    </div>
+  </footer>
+  <script type="module">
+    import { el, fillHeader, loadSite } from "/js/site.js";
+    const site = await loadSite();
+    fillHeader(site);
+    const copy = document.getElementById("about-copy");
+    copy.append(el("p", { class: "lead" }, "النص التعريفي كما هو منشور في نبذة الصفحة:"));
+    site.bio.forEach((line) => copy.append(el("p", {}, line)));
+    copy.append(el("p", { class: "note" }, `${site.followers} على فيسبوك.`));
+    document.getElementById("rating").textContent = site.rating;
+    const services = document.getElementById("services");
+    site.services.forEach((item) => services.append(el("li", {}, item)));
+    const reviews = document.getElementById("reviews");
+    site.reviews.forEach((review) => {
+      reviews.append(el("blockquote", { class: "card panel review" }, [
+        el("p", {}, review.text),
+        el("footer", {}, review.name)
+      ]));
+    });
+  </script>
+</body>
+</html>

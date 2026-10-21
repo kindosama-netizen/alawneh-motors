@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>السيارات | مؤسسة سامر العلاونه</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="/media/profile.jpg">
+</head>
+<body>
+  <header class="header">
+    <div class="wrap header-inner">
+      <a class="brand" href="/">
+        <img data-logo src="/media/profile.jpg" alt="صورة صفحة المعرض">
+        <div>
+          <strong data-brand-name>مؤسسة سامر عبد العزيز العلاونه لتجارة السيارات</strong>
+          <span>إربد · شارع المعارض وشارع حكما</span>
+        </div>
+      </a>
+      <nav class="nav">
+        <a href="/">الرئيسية</a>
+        <a href="/cars" aria-current="page">السيارات</a>
+        <a href="/about">من نحن</a>
+        <a href="/contact">تواصل معنا</a>
+      </nav>
+      <a class="header-call" href="tel:+962792066680">اتصال 0792066680</a>
+    </div>
+  </header>
+  <main class="section">
+    <div class="wrap">
+      <h1>السيارات</h1>
+      <p class="lead">بحث وفلترة ضمن السيارات المستخرجة من منشورات الصفحة. المنشور القديم لا يعني أن السيارة ما زالت متوفرة.</p>
+      <form class="filters" id="filters">
+        <input name="q" type="search" placeholder="ابحث بالموديل أو المواصفة" aria-label="بحث">
+        <select name="brand" aria-label="الشركة"><option value="">كل الشركات</option></select>
+        <select name="year" aria-label="سنة الصنع"><option value="">كل السنوات</option></select>
+        <select name="fuel" aria-label="نوع الدفع"><option value="">كل الأنواع</option></select>
+        <select name="status" aria-label="الحالة">
+          <option value="">كل الحالات</option>
+          <option value="check">تواصل للتأكد من التوفر</option>
+          <option value="sold">مباع</option>
+        </select>
+      </form>
+      <div class="cars-grid" id="results"></div>
+    </div>
+  </main>
+  <footer class="footer">
+    <div class="wrap footer-grid">
+      <strong>مؤسسة سامر عبد العزيز العلاونه لتجارة السيارات</strong>
+      <a href="/contact">تواصل معنا</a>
+    </div>
+  </footer>
+  <script type="module">
+    import { applyFilters, carCard, el, fillHeader, loadCars, loadSite, unique } from "/js/site.js";
+    const [site, cars] = await Promise.all([loadSite(), loadCars()]);
+    fillHeader(site);
+    const form = document.getElementById("filters");
+    const params = new URLSearchParams(location.search);
+    const brand = form.brand;
+    const year = form.year;
+    const fuel = form.fuel;
+    unique(cars, "brand").sort().forEach((value) => brand.append(new Option(value, value)));
+    unique(cars, "year").sort((a, b) => b - a).forEach((value) => year.append(new Option(value, value)));
+    unique(cars, "fuel").forEach((value) => fuel.append(new Option(value, value)));
+    for (const [key, value] of params) {
+      if (form.elements[key]) form.elements[key].value = value;
+    }
+    const results = document.getElementById("results");
+    function render() {
+      const next = new URLSearchParams(new FormData(form));
+      for (const [key, value] of [...next]) if (!value) next.delete(key);
+      history.replaceState(null, "", next.toString() ? `?${next}` : location.pathname);
+      const found = applyFilters(cars, next);
+      results.replaceChildren();
+      if (!found.length) {
+        results.append(el("div", { class: "card empty" }, "لا توجد سيارات مطابقة للبحث."));
+        return;
+      }
+      found.forEach((car) => results.append(carCard(car)));
+    }
+    form.addEventListener("input", render);
+    render();
+  </script>
+</body>
+</html>

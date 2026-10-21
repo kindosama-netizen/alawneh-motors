@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>تفاصيل السيارة</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="/media/profile.jpg">
+</head>
+<body>
+  <header class="header">
+    <div class="wrap header-inner">
+      <a class="brand" href="/">
+        <img data-logo src="/media/profile.jpg" alt="صورة صفحة المعرض">
+        <div>
+          <strong data-brand-name>مؤسسة سامر عبد العزيز العلاونه لتجارة السيارات</strong>
+          <span>إربد · شارع المعارض وشارع حكما</span>
+        </div>
+      </a>
+      <nav class="nav">
+        <a href="/">الرئيسية</a>
+        <a href="/cars">السيارات</a>
+        <a href="/about">من نحن</a>
+        <a href="/contact">تواصل معنا</a>
+      </nav>
+      <a class="header-call" href="tel:+962792066680">اتصال 0792066680</a>
+    </div>
+  </header>
+  <main class="section">
+    <div class="wrap" id="detail">جارٍ التحميل…</div>
+  </main>
+  <footer class="footer">
+    <div class="wrap footer-grid">
+      <strong>مؤسسة سامر عبد العزيز العلاونه لتجارة السيارات</strong>
+      <a href="/cars">العودة للسيارات</a>
+    </div>
+  </footer>
+  <script type="module">
+    import { callHref, el, fillHeader, loadCars, loadSite, priceText, statusText, whatsappHref } from "/js/site.js";
+    const site = await loadSite();
+    fillHeader(site);
+    const id = location.pathname.split("/").filter(Boolean).pop();
+    const root = document.getElementById("detail");
+    let car;
+    try {
+      car = (await loadCars()).find((item) => item.id === id);
+      if (!car) throw new Error("missing");
+    } catch {
+      root.textContent = "هذه السيارة غير موجودة.";
+    }
+    if (!car) {
+      /* تبقى رسالة عدم الوجود */
+    } else {
+    document.title = `${car.title} | مؤسسة سامر العلاونه`;
+    const images = car.images?.length ? car.images : ["/media/cover.jpg"];
+    const main = el("img", { class: "gallery-main", src: images[0], alt: car.title });
+    const thumbs = el("div", { class: "thumbs" });
+    images.forEach((src, index) => {
+      const button = el("button", { type: "button", "aria-label": `صورة ${index + 1}` }, [
+        el("img", { src, alt: "" })
+      ]);
+      if (index === 0) button.setAttribute("aria-current", "true");
+      button.addEventListener("click", () => {
+        main.src = src;
+        thumbs.querySelectorAll("button").forEach((item) => item.removeAttribute("aria-current"));
+        button.setAttribute("aria-current", "true");
+      });
+      thumbs.append(button);
+    });
+    const facts = [
+      ["الشركة", car.brand],
+      ["الموديل", car.model],
+      ["سنة الصنع", car.year],
+      ["العداد", car.mileage],
+      ["اللون", car.color],
+      ["النوع", car.fuel]
+    ].filter(([, value]) => value);
+    const specList = el("ul", { class: "specs" }, (car.specs || []).map((item) => el("li", {}, item)));
+    const box = el("aside", { class: "card sticky-box panel" }, [
+      el("span", { class: car.status === "sold" ? "badge badge-sold" : "badge badge-check" }, statusText(car)),
+      el("div", { class: "price" }, priceText(car)),
+      car.offerNote ? el("p", { class: "note" }, car.offerNote) : null,
+      el("p", { class: "note" }, car.source || ""),
+      el("a", { class: "btn btn-wa", href: whatsappHref(car), target: "_blank", rel: "noopener" }, "واتساب عن هذه السيارة"),
+      el("a", { class: "btn btn-navy", href: callHref() }, "اتصال 0792066680")
+    ]);
+    root.replaceChildren(el("div", { class: "detail" }, [
+      el("div", {}, [
+        el("div", { class: "gallery" }, [main, images.length > 1 ? thumbs : null]),
+        el("h1", {}, car.title),
+        facts.length ? el("ul", { class: "facts" }, facts.map(([label, value]) => {
+          const item = document.createElement("li");
+          item.append(el("span", {}, label), el("b", {}, value));
+          return item;
+        })) : null,
+        el("h2", {}, "المواصفات المنشورة"),
+        specList
+      ]),
+      box
+    ]));
+    }
+  </script>
+</body>
+</html>
